@@ -30,14 +30,22 @@ router.post('/notes', (req, res) => {
 });
 
 //delete 
- router.delete('/notes/:id', (req, res) => {
+router.delete('/notes/:id', (req, res) => {
     const noteId = req.params.id;
-     console.info(`${req.method} deleted request was called`);
-     fs.readFile(path.join(__dirname, '../db/db.json'), 'utf8', (err, data) => {
-        let notes = JSON.parse(data);
-        const deleteId = notes.filter()
-     })
-    })
+    console.info(`${req.method} deleted request was called`);
+    fs.readFile(path.join(__dirname, '../db/db.json'), 'utf8', (err, data) => {
+      let notes = JSON.parse(data);
+      const remainingNotes = notes.filter(note => note.id !== noteId);
+      fs.writeFile(path.join(__dirname, '../db/db.json'), JSON.stringify(remainingNotes), (err) => {
+        if (err) {
+          res.status(500).json({ error: 'Failed to delete note' });
+          return;
+        }
+        res.status(200).json({ message: 'Note deleted successfully' });
+      });
+    });
+  });
+  
 
 // let deleteData = fs.readFileSync('./db/db.json');
 module.exports = router;
